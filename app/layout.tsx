@@ -3,8 +3,7 @@ import { inter } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Aplikasi Perbankan",
-  description: "Aplikasi perbankan sederhana dengan Next.js",
+  title: "UKL 2025",
 };
 
 export default function RootLayout({
