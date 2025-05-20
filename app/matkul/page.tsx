@@ -12,7 +12,7 @@ export default function MatkulPage() {
   const [matkuls, setMatkuls] = useState<Matkul[]>([]);
   const [selected, setSelected] = useState<{ [id: string]: boolean }>({});
   const [loading, setLoading] = useState(true);
-  const [notif, setNotif] = useState('');
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [submitted, setSubmitted] = useState<Matkul[] | null>(null);
 
   useEffect(() => {
@@ -34,8 +34,8 @@ export default function MatkulPage() {
     e.preventDefault();
     const selectedMatkul = matkuls.filter(m => selected[m.id]);
     if (selectedMatkul.length === 0) {
-      setNotif('Pilih minimal satu mata kuliah!');
-      setTimeout(() => setNotif(''), 2000);
+      setToast({ type: 'error', message: 'Pilih minimal satu mata kuliah!' });
+      setTimeout(() => setToast(null), 2000);
       return;
     }
     try {
@@ -46,26 +46,28 @@ export default function MatkulPage() {
       });
       const data = await response.json();
       if (data.status) {
-        setNotif('Berhasil: ' + data.message);
+        setToast({ type: 'success', message: 'Berhasil: ' + data.message });
         setSubmitted(selectedMatkul);
       } else {
-        setNotif('Gagal: ' + (data.message || 'Gagal menyimpan pilihan'));
+        setToast({ type: 'error', message: 'Gagal: ' + (data.message || 'Gagal menyimpan pilihan') });
       }
     } catch (err) {
-      setNotif('Gagal: Tidak dapat menghubungi server');
+      setToast({ type: 'error', message: 'Gagal: Tidak dapat menghubungi server' });
     }
-    setTimeout(() => setNotif(''), 2500);
+    setTimeout(() => setToast(null), 2500);
   };
 
   const handleReset = () => {
     setSelected({});
     setSubmitted(null);
-    setNotif('');
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-sky-100 to-white flex flex-col items-center py-12 px-4">
       <HomeButton />
+      {toast && (
+        <div className={`fixed top-20 right-8 z-50 px-6 py-3 rounded-lg shadow-lg animate-fadeIn font-semibold text-white ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>{toast.message}</div>
+      )}
       <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8 animate-fadeIn">
         <h2 className="text-2xl font-bold text-indigo-700 mb-6 text-center">Daftar Mata Kuliah</h2>
         {submitted ? (
@@ -80,6 +82,7 @@ export default function MatkulPage() {
                 </li>
               ))}
             </ul>
+            <div className="mb-6 text-center text-indigo-700 font-semibold">Total matkul dipilih: {submitted.length}</div>
             <button
               type="button"
               onClick={handleReset}
@@ -132,7 +135,6 @@ export default function MatkulPage() {
             >
               simpan yang terpilih
             </button>
-            {notif && <div className="mt-4 text-center text-sm font-semibold text-green-600 animate-fadeIn">{notif}</div>}
           </form>
         )}
       </div>

@@ -20,6 +20,7 @@ export default function LoginPage() {
     username: '',
     password: '',
   });
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -31,6 +32,13 @@ export default function LoginPage() {
     setError('');
     setSuccess('');
     setLoading(true);
+
+    if (formData.password.length < 8) {
+      setToast({ type: 'error', message: 'Password minimal 8 karakter' });
+      setLoading(false);
+      setTimeout(() => setToast(null), 2000);
+      return;
+    }
 
     try {
       const response = await fetch('https://learn.smktelkom-mlg.sch.id/ukl1/api/login', {
@@ -44,12 +52,17 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (data.status) {
-        setSuccess('Login berhasil!');
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('loginSuccess', '1');
+        }
+        router.push('/profile');
       } else {
-        setError(data.message || 'Username atau password salah');
+        setToast({ type: 'error', message: data.message || 'Username atau password salah' });
+        setTimeout(() => setToast(null), 2000);
       }
     } catch (err) {
-      setError('Terjadi kesalahan saat menghubungi server');
+      setToast({ type: 'error', message: 'Terjadi kesalahan saat menghubungi server' });
+      setTimeout(() => setToast(null), 2000);
     } finally {
       setLoading(false);
     }
@@ -58,6 +71,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-sky-100 to-white flex flex-col justify-center items-center py-12 px-4">
       <HomeButton />
+      {toast && (
+        <div className={`fixed top-20 right-8 z-50 px-6 py-3 rounded-lg shadow-lg animate-fadeIn font-semibold text-white ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>{toast.message}</div>
+      )}
       <div className="w-full max-w-md space-y-8">
         <div className="bg-white rounded-2xl shadow-lg p-8 animate-fadeIn">
           <h2 className="text-center text-3xl font-bold text-indigo-700 mb-2">Selamat Datang</h2>
@@ -80,8 +96,6 @@ export default function LoginPage() {
               required
               placeholder="Masukkan password Anda"
             />
-            {error && <div className="text-red-500 text-center">{error}</div>}
-            {success && <div className="text-green-600 text-center">{success}</div>}
             <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">{loading ? 'Memproses...' : 'Masuk'}</Button>
           </form>
           <div className="text-center mt-4">
