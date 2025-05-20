@@ -12,6 +12,7 @@ interface ProfileData {
   alamat: string;
   gender: string;
   telepon: string;
+  foto?: string; // tambahkan ini
 }
 
 export default function ProfilePage() {
@@ -82,11 +83,18 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-sky-100 to-white flex flex-col justify-center items-center py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-sky-100 to-white flex flex-col items-center py-12 px-4">
       <HomeButton />
       <div className="w-full max-w-xl space-y-8">
         <div className="bg-white rounded-2xl shadow-lg p-8 animate-fadeIn">
           <h3 className="text-2xl font-bold text-indigo-700 mb-6 text-center">Profil Pengguna</h3>
+          <div className="flex justify-center mb-6">
+            <img
+              src="/Profile.webp"
+              alt="Profile"
+              className="w-32 h-32 rounded-full object-cover border-4 border-indigo-200 shadow bg-slate-100"
+            />
+          </div>
           <form onSubmit={handleSubmit} className="space-y-5">
             <Input
               label="Nama Lengkap"
