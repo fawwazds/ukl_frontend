@@ -10,6 +10,7 @@ interface InputProps {
   required?: boolean;
   placeholder?: string;
   isTextArea?: boolean;
+  pattern?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -22,7 +23,8 @@ const Input: React.FC<InputProps> = ({
   required = false,
   placeholder = '',
   isTextArea = false,
-}) => {
+  pattern,
+})=> {
   const baseStyles = 'w-full px-4 py-3 rounded-lg border border-slate-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 bg-white text-slate-800 transition';
   const errorStyles = error ? 'border-red-500' : '';
 
@@ -41,8 +43,7 @@ const Input: React.FC<InputProps> = ({
           placeholder={placeholder}
           required={required}
         />
-      ) : (
-        <input
+      ) : (        <input
           type={type}
           id={name}
           name={name}
@@ -51,6 +52,7 @@ const Input: React.FC<InputProps> = ({
           className={`${baseStyles} ${errorStyles}`}
           placeholder={placeholder}
           required={required}
+          pattern={pattern}
         />
       )}
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}

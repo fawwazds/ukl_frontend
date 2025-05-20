@@ -20,8 +20,7 @@ interface RegisterForm {
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [formData, setFormData] = useState<RegisterForm>({
+  const [error, setError] = useState('');  const [formData, setFormData] = useState<RegisterForm>({
     nama_nasabah: '',
     gender: '',
     alamat: '',
@@ -31,10 +30,17 @@ export default function RegisterPage() {
     confirmPassword: '',
     foto: null,
   });
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // For telepon field, allow only numeric input
+    if (name === 'telepon') {
+      // Remove any non-numeric characters
+      const numericValue = value.replace(/\D/g, '');
+      setFormData(prev => ({ ...prev, [name]: numericValue }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,10 +79,10 @@ export default function RegisterPage() {
         router.push('/login');
       } else {
         setError(data.message || 'Terjadi kesalahan saat registrasi');
-      }
-    } catch (err) {
+      }    } catch (err: unknown) {
+      console.error(err);
       setError('Terjadi kesalahan saat menghubungi server');
-    } finally {
+    }finally {
       setLoading(false);
     }
   };
@@ -115,13 +121,14 @@ export default function RegisterPage() {
               onChange={handleChange}
               isTextArea
               required
-            />
-            <Input
+            />            <Input
               label="Nomor Telepon"
               name="telepon"
+              type='tel'
               value={formData.telepon}
               onChange={handleChange}
               required
+              pattern="[0-9]*"
             />
             <Input
               label="Username"
